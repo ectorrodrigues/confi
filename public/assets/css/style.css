@@ -655,7 +655,7 @@ textarea {
   padding: 5px 7px;
   margin-top: 5px;
   color: #777;
-  font-size: 10.5px;
+  font-size: 12px;
 }
 
 .ledger-row strong {
@@ -849,14 +849,14 @@ textarea {
   margin: 5px 0;
 }
 
-.client-name-pill,
-.rec-item {
-  border: 1px solid #dedfe1;
-  border-radius: 16px;
-  padding: 6px 15px;
-  color: #74767a;
-  font-size: 12px;
-  background: #fff;
+
+.client-name-pill, .rec-item {
+    border: 1px solid #dedfe1;
+    border-radius: 20px;
+    padding: 10px 15px;
+    color: #74767a;
+    font-size: 14px;
+    background: #fff;
 }
 
 .recurring-list {
@@ -873,7 +873,7 @@ textarea {
 }
 
 .rec-day {
-  font-size: 11px;
+  font-size: 14px;
   color: #777;
   text-align: center;
 }
@@ -885,19 +885,19 @@ textarea {
 }
 
 .login-logo {
-  position: absolute;
-  top: 31px;
-  left: 66px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 29px;
-  letter-spacing: -1.8px;
+    position: relative;
+    margin-top: 30px;
+    left: 66px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 29px;
+    letter-spacing: -1.8px;
 }
 
 .login-card {
   width: 405px;
-  margin: 170px auto 0;
+  margin: 100px auto 0;
 }
 
 .login-card h1 {
@@ -1074,4 +1074,5 @@ textarea {
     align-self: flex-start;
   }
 }
+
 
