@@ -27,7 +27,7 @@ function parse_money(mixed $value): float {
 }
 
 function date_br(?string $date): string {
-    return $date ? date('d/m/Y', strtotime($date)) : '';
+    return $date ? date('d/m/y', strtotime($date)) : '';
 }
 
 function month_label(string $ymd): string {

@@ -71,7 +71,7 @@
 
             <?php foreach ($rows as $r): ?>
                 <div class="ledger-row">
-                    <span><?= e(date_br($r['transaction_date'])) ?> </span>
+                    <span style="color:#aaa;"><?= e(date_br($r['transaction_date'])) ?> </span>
                     <strong style="margin-left: 15px;"><?= e($r['client_name'] ?: $r['item']) ?></strong>
                     <span><?= e(money($r['amount'])) ?></span>
                     <span class="mini-status <?= $r['status'] === 'Pago' ? 'paid' : 'pending' ?>"><?= e($r['status']) ?></span>
