@@ -45,25 +45,114 @@ class Transaction {
 
     public function evolution(string $currentMonth): array {
         $start = (new DateTime(month_start($currentMonth)))->modify('-5 months');
-        $months=[];
-        $st=$this->db->prepare("SELECT kind, COALESCE(SUM(amount),0) total FROM transactions WHERE period_month=? GROUP BY kind");
-        for($i=0;$i<7;$i++){
-            $m=$start->format('Y-m-01'); $in=0.0; $out=0.0; $st->execute([$m]);
-            foreach($st->fetchAll() as $row){ if($row['kind']==='entrada')$in=(float)$row['total']; else $out=(float)$row['total']; }
-            $months[]=['month'=>$m,'label'=>month_label($m),'entrada'=>$in,'saida'=>$out,'balanco'=>$in-$out];
+        $months = [];
+
+        $st = $this->db->prepare("
+            SELECT
+                kind,
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN status = 'Pago' THEN amount
+                            ELSE 0
+                        END
+                    ),
+                    0
+                ) AS paid_total,
+                COALESCE(SUM(amount), 0) AS total
+            FROM transactions
+            WHERE period_month = ?
+            GROUP BY kind
+        ");
+
+        for ($i = 0; $i < 7; $i++) {
+
+            $m = $start->format('Y-m-01');
+
+            $in = 0.0;
+            $out = 0.0;
+
+            $st->execute([$m]);
+
+            foreach ($st->fetchAll() as $row) {
+
+                /*
+                * Próximo mês:
+                * previsão = Pago + Pendente
+                */
+                if ($i === 6) {
+                    $value = (float) $row['total'];
+                }
+
+                /*
+                * Meses anteriores + mês atual:
+                * realizado = somente Pago
+                */
+                else {
+                    $value = (float) $row['paid_total'];
+                }
+
+                if ($row['kind'] === 'entrada') {
+                    $in = $value;
+                } else {
+                    $out = $value;
+                }
+            }
+
+            $months[] = [
+                'month'    => $m,
+                'label'    => month_label($m),
+                'entrada'  => $in,
+                'saida'    => $out,
+                'balanco'  => $in - $out
+            ];
+
             $start->modify('+1 month');
         }
+
         return $months;
     }
 
     public function currentBalance(string $month): float {
-        $st=$this->db->prepare("SELECT COALESCE(SUM(CASE WHEN kind='entrada' THEN amount ELSE -amount END),0) FROM transactions WHERE period_month=?");
-        $st->execute([month_start($month)]); return (float)$st->fetchColumn();
-    }
+    $st = $this->db->prepare("
+        SELECT COALESCE(
+            SUM(
+                CASE
+                    WHEN kind = 'entrada' AND status = 'Pago' THEN amount
+                    WHEN kind = 'saida' AND status = 'Pago' THEN -amount
+                    ELSE 0
+                END
+            ),
+            0
+        )
+        FROM transactions
+        WHERE period_month = ?
+    ");
+
+    $st->execute([month_start($month)]);
+
+    return (float)$st->fetchColumn();
+}
 
     public function allTime(string $throughMonth): float {
-        $st=$this->db->prepare("SELECT COALESCE(SUM(CASE WHEN kind='entrada' THEN amount ELSE -amount END),0) FROM transactions WHERE period_month<=?");
-        $st->execute([month_start($throughMonth)]); return (float)$st->fetchColumn();
+        $st=$this->db->prepare("
+            SELECT COALESCE(
+                SUM(
+                    CASE
+                        WHEN kind='entrada' AND status='Pago' THEN amount
+                        WHEN kind='saida' AND status='Pago' THEN -amount
+                        ELSE 0
+                    END
+                ),
+                0
+            )
+            FROM transactions
+            WHERE period_month<=?
+        ");
+
+        $st->execute([month_start($throughMonth)]);
+
+        return (float)$st->fetchColumn();
     }
 
     public function latest(int $limit=15): array {

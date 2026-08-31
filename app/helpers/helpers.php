@@ -14,6 +14,7 @@ function money_signed(float|int|null $value): string {
     return ($n >= 0 ? '+ ' : '- ') . money(abs($n));
 }
 
+
 function parse_money(mixed $value): float {
     $s = trim((string)$value);
     if ($s === '') return 0.0;

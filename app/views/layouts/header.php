@@ -11,13 +11,16 @@
     <link rel="stylesheet" href="<?= e(asset_url('css/style.css')) ?>">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.7.2/css/all.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/shift-away.css">
     <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 </head>
 <body class="app-body">
 <div class="app-shell">
     <aside class="sidebar">
         <a class="sidebar-brand" href="<?= e(url('dashboard')) ?>" aria-label="confi">
-            <span class="brand-mark"><i class="fa-solid fa-sack-dollar"></i></span>
+            <span class="brand-mark"><img class="client-logo" src="<?= e(asset_url('img/confi_icon.png')) ?>" alt="<?= e(APP_CLIENT) ?>"></span>
         </a>
         <nav class="side-nav">
             <a class="<?= $page === 'dashboard' ? 'active' : '' ?>" href="<?= e(url('dashboard')) ?>"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></a>
@@ -29,11 +32,10 @@
     </aside>
     <div class="main-wrap">
         <header class="topbar">
-            <a class="top-logo" href="<?= e(url('dashboard')) ?>"><span class="brand-mark small"><i class="fa-solid fa-sack-dollar"></i></span><strong>confi</strong></a>
             <div class="top-actions">
                 <a href="<?= e(url('entrada')) ?>" class="btn btn-green"><i class="fa-solid fa-plus"></i> Lançar Entrada</a>
                 <a href="<?= e(url('saida')) ?>" class="btn btn-red"><i class="fa-solid fa-plus"></i> Lançar Saída</a>
-                <img class="client-logo" src="<?= e(asset_url('img/client-logo.svg')) ?>" alt="<?= e(APP_CLIENT) ?>">
+                <img class="client-logo" src="<?= e(asset_url('img/client-logo.png')) ?>" alt="<?= e(APP_CLIENT) ?>">
             </div>
         </header>
         <main class="content">
