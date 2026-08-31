@@ -72,7 +72,7 @@
             <?php foreach ($rows as $r): ?>
                 <div class="ledger-row">
                     <span style="color:#aaa;"><?= e(date_br($r['transaction_date'])) ?> </span>
-                    <strong style="margin-left: 15px;"><?= e($r['client_name'] ?: $r['item']) ?></strong>
+                    <strong style="margin-left: 15px;"><?= ucwords(strtolower(e($r['client_name'] ?: $r['item']))) ?></strong>
                     <span><?= e(money($r['amount'])) ?></span>
                     <span class="mini-status <?= $r['status'] === 'Pago' ? 'paid' : 'pending' ?>"><?= e($r['status']) ?></span>
                     <a class="circle-search" href="<?= e(url($kind, ['id' => $r['id']])) ?>" aria-label="Ver lançamento">

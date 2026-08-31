@@ -439,7 +439,7 @@ textarea {
 
 .history-date {
   color: #8a8d92;
-  font-size: 11px;
+  font-size: 13px;
   white-space: nowrap;
 }
 
@@ -655,7 +655,7 @@ textarea {
   padding: 5px 7px;
   margin-top: 5px;
   color: #777;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .ledger-row strong {
