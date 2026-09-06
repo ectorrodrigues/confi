@@ -180,6 +180,7 @@ class Transaction {
         }
         $method=$data['payment_method'];
         $date=$data['transaction_date'];
+        $originalDate=$data['original_date'] ?? $date;
         $total=(float)$data['amount'];
         $notes=$data['notes'] ?? null;
         $installments=$method==='Cartão de Crédito' ? installment_count($data['installments']) : 1;
@@ -197,7 +198,7 @@ class Transaction {
             return $firstId;
         }
         $st=$this->db->prepare('INSERT INTO transactions(kind,client_id,item,amount,payment_method,installments,brand,status,transaction_date,period_month,notes,original_date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)');
-        $st->execute([$kind,$data['client_id'],$data['item'],$total,$method,$data['installments'],'',$data['status'],$date,month_start($date),$notes,$date]);
+        $st->execute([$kind,$data['client_id'],$data['item'],$total,$method,$data['installments'],'',$data['status'],$date,month_start($date),$notes,$originalDate]);
         return (int)$this->db->lastInsertId();
     }
 

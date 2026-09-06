@@ -35,12 +35,17 @@ class TransactionController {
             ];
             if($editing) $data['original_date']=(string)($transaction['original_date']??$transaction['transaction_date']??$data['transaction_date']);
             if($data['item']==='') $errors[]='Informe o item.';
-            $dateOk = DateTime::createFromFormat('Y-m-d', $data['transaction_date']);
-            if(!$dateOk || $dateOk->format('Y-m-d') !== $data['transaction_date']) $errors[]='Informe uma data válida.';
             if($data['amount']<=0) $errors[]='Informe um valor maior que zero.';
             $validPayments = payment_options();
             if($legacyPayment) $validPayments[] = trim((string)($transaction['payment_method']??''));
             if(!in_array($data['payment_method'],$validPayments,true)) $errors[]='Método de pagamento inválido.';
+            if(!$editing && $data['payment_method']==='Débito') {
+                $today = new DateTimeImmutable('today');
+                $data['original_date'] = $today->format('Y-m-d');
+                $data['transaction_date'] = $today->modify('+1 day')->format('Y-m-d');
+            }
+            $dateOk = DateTime::createFromFormat('Y-m-d', $data['transaction_date']);
+            if(!$dateOk || $dateOk->format('Y-m-d') !== $data['transaction_date']) $errors[]='Informe uma data válida.';
             if($kind==='entrada' && $data['client_id']===null) $errors[]='Selecione um cliente.';
             if($data['payment_method']==='Cartão de Crédito'){
                 if(!in_array($data['installments'],parcel_options(),true)) $errors[]='Selecione o número de parcelas.';
