@@ -31,5 +31,6 @@ switch($route){
     case '/recorrencia': (new RecurringController())->form(); break;
     case '/recorrencia/excluir': if($_SERVER['REQUEST_METHOD']==='POST')(new RecurringController())->delete(); else redirect_to('recorrencias'); break;
     case '/lancamento/excluir': if($_SERVER['REQUEST_METHOD']==='POST')(new TransactionController())->delete(); else redirect_to('lancamentos'); break;
+    case '/lancamentos/recorrencias': if($_SERVER['REQUEST_METHOD']==='POST')(new TransactionController())->launchRecurrings(); else redirect_to('lancamentos'); break;
     default: http_response_code(404); echo 'Página não encontrada.'; break;
 }

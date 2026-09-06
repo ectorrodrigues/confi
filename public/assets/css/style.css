@@ -201,6 +201,12 @@ textarea {
   color: #111;
 }
 
+.recurring-launch {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
 .page-title {
   display: flex;
   align-items: center;
@@ -1074,5 +1080,4 @@ textarea {
     align-self: flex-start;
   }
 }
-
 

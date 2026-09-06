@@ -62,4 +62,16 @@ class TransactionController {
     public function delete(): void {
         require_auth(); verify_csrf(); $id=(int)($_POST['id']??0); if($id>0)(new Transaction(db()))->delete($id); flash('success','Lançamento excluído.'); redirect_to('lancamentos');
     }
+
+    public function launchRecurrings(): void {
+        require_auth();
+        verify_csrf();
+        $month = month_start((string) ($_POST['month'] ?? date('Y-m-01')));
+        $created = launch_recurring_expenses_for_month($month);
+        flash('success', $created > 0
+            ? "{$created} recorrência(s) lançada(s) em " . month_label($month) . '.'
+            : 'Todas as recorrências já foram lançadas neste mês.'
+        );
+        redirect_to('lancamentos', ['month' => $month]);
+    }
 }

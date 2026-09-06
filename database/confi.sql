@@ -1,6 +1,7 @@
 CREATE DATABASE IF NOT EXISTS confi CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE confi;
 SET FOREIGN_KEY_CHECKS=0;
+DROP TABLE IF EXISTS recurring_releases;
 DROP TABLE IF EXISTS transactions;
 DROP TABLE IF EXISTS recurrings;
 DROP TABLE IF EXISTS clients;
@@ -62,6 +63,18 @@ CREATE TABLE transactions (
   INDEX idx_transactions_due(transaction_date,status,payment_method),
   INDEX idx_transactions_group(installment_group),
   CONSTRAINT fk_transactions_client FOREIGN KEY(client_id) REFERENCES clients(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE recurring_releases (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  recurring_id INT UNSIGNED NOT NULL,
+  period_month DATE NOT NULL,
+  transaction_id BIGINT UNSIGNED NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_recurring_releases_period (recurring_id, period_month),
+  INDEX idx_recurring_releases_transaction (transaction_id),
+  CONSTRAINT fk_recurring_releases_recurring FOREIGN KEY (recurring_id) REFERENCES recurrings(id) ON DELETE CASCADE,
+  CONSTRAINT fk_recurring_releases_transaction FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Demo login for local MAMP
