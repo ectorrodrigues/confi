@@ -460,10 +460,12 @@ textarea {
 
 .paid {
   color: #52ad62;
+  font-weight: 700;
 }
 
 .pending {
-  color: #aaa;
+  color: #666;
+  font-weight: 700;
 }
 
 .circle-search,
@@ -653,7 +655,7 @@ textarea {
 
 .ledger-row {
   display: grid;
-  grid-template-columns: 70px minmax(0, 1fr) 82px 51px 25px;
+  grid-template-columns: 70px minmax(0, 1fr) 92px 51px 25px;
   gap: 6px;
   align-items: center;
   border: 1px solid #e0e2e4;
