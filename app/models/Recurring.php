@@ -57,12 +57,11 @@ class Recurring {
      * Cada recorrência é criada como uma saída Pendente e fica
      * associada ao mês de referência para impedir duplicidades.
      */
-    public function generateForNextMonth(string $referenceDate): int {
+    public function generateForMonth(string $targetMonth): int {
         $this->ensureTransactionRecurringColumns();
 
-        $reference = new DateTime($referenceDate);
-        $nextMonth = (clone $reference)->modify('first day of next month');
-        $targetMonth = $nextMonth->format('Y-m-01');
+        $targetMonth = month_start($targetMonth);
+        $targetDate = new DateTime($targetMonth);
 
         $recurrences = $this->allActive();
         if (!$recurrences) {
@@ -99,9 +98,9 @@ class Recurring {
                 }
 
                 $day = max(1, min(31, (int)$rec['day_of_month']));
-                $lastDay = (int)$nextMonth->format('t');
+                $lastDay = (int)$targetDate->format('t');
                 $day = min($day, $lastDay);
-                $dueDate = $nextMonth->format('Y-m-') . str_pad((string)$day, 2, '0', STR_PAD_LEFT);
+                $dueDate = $targetDate->format('Y-m-') . str_pad((string)$day, 2, '0', STR_PAD_LEFT);
 
                 $insert->execute([
                     $rec['item'],
@@ -125,6 +124,12 @@ class Recurring {
         }
 
         return $created;
+    }
+
+    public function generateForNextMonth(string $referenceDate): int {
+        $reference = new DateTime($referenceDate);
+        $targetMonth = (clone $reference)->modify('first day of next month')->format('Y-m-01');
+        return $this->generateForMonth($targetMonth);
     }
 
     private function ensureTransactionRecurringColumns(): void {

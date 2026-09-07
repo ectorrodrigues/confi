@@ -50,7 +50,7 @@ textarea {
   top: 0;
   bottom: 0;
   width: 171px;
-  background: var(--green);
+  background: #222;
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -125,7 +125,7 @@ textarea {
 
 .topbar {
   height: 68px;
-  background: var(--green);
+  background: #222;
   color: #fff;
   display: flex;
   align-items: center;
@@ -300,7 +300,7 @@ textarea {
 
 .service-order-row {
   display: grid;
-  grid-template-columns: 120px minmax(180px, 1.1fr) minmax(180px, 1.5fr) 100px 72px 30px;
+  grid-template-columns: 120px minmax(180px, 1.1fr) minmax(180px, 1.5fr) minmax(180px, 1.5fr) 100px 32px 30px;
   align-items: center;
   gap: 10px;
   width: 100%;

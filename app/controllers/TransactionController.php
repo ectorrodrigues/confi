@@ -54,6 +54,13 @@ class TransactionController {
             if(!$errors){
                 $saved=$tx->createOrReplace($data,$kind,$id);
                 flash('success',$id>0?'Lançamento atualizado.':'Lançamento criado.');
+
+                // Ao usar o botão "Salvar e Imprimir" em uma entrada, salva normalmente
+                // e em seguida abre a mesma impressão da Ordem de Serviço.
+                if($kind==='entrada' && isset($_POST['save_and_print'])) {
+                    redirect_to('ordem-de-servico/imprimir',['id'=>$saved]);
+                }
+
                 $redirectMonth=$data['payment_method']==='Cartão de Crédito' ? month_start(add_month_same_day($data['transaction_date'],1)) : month_start($data['transaction_date']);
                 redirect_to('lancamentos',['month'=>$redirectMonth]);
             }

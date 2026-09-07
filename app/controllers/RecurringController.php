@@ -14,4 +14,23 @@ class RecurringController {
         $page='recorrencias'; $title=$editing?'Editar Recorrência':'Recorrências'; require __DIR__.'/../views/recurrings/form.php';
     }
     public function delete(): void { require_auth(); verify_csrf(); (new Recurring(db()))->delete((int)($_POST['id']??0)); flash('success','Recorrência excluída.'); redirect_to('recorrencias'); }
+
+    public function generateForMonth(): void {
+        require_auth();
+        verify_csrf();
+
+        $month = month_start((string)($_POST['month'] ?? date('Y-m-01')));
+        $created = (new Recurring(db()))->generateForMonth($month);
+
+        if ($created > 0) {
+            flash('success', $created === 1
+                ? '1 recorrência foi lançada nas saídas do mês selecionado.'
+                : $created . ' recorrências foram lançadas nas saídas do mês selecionado.'
+            );
+        } else {
+            flash('success', 'Nenhuma nova recorrência foi lançada. Elas já podem ter sido lançadas neste mês.');
+        }
+
+        redirect_to('lancamentos', ['month' => $month]);
+    }
 }

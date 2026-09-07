@@ -149,17 +149,34 @@
             <i class="fa-solid fa-floppy-disk"></i>
             Salvar
         </button>
-        <?php if ($isEntrada && $editing && !empty($transaction['service_order_number'])): ?>
-            <a
-                href="<?= e(url('ordem-de-servico/imprimir', ['id' => $transaction['id']])) ?>"
-                class="btn btn-secondary"
-                target="_blank"
-                rel="noopener"
-            >
-                <i class="fa-solid fa-print"></i>
-                Imprimir Ordem de Serviço
-            </a>
-        <?php endif; ?>
+        
+    </div>
+    <div class="row justify-content-end py-3">
+        <div class="col-lg-12 col-10">
+            <?php if ($isEntrada): ?>
+                <?php if ($editing && !empty($transaction['service_order_number'])): ?>
+                    <a
+                        href="<?= e(url('ordem-de-servico/imprimir', ['id' => $transaction['id']])) ?>"
+                        class="btn btn-secondary"
+                        target="_blank"
+                        rel="noopener"
+                    >
+                        <i class="fa-solid fa-print"></i>
+                        Imprimir Ordem de Serviço
+                    </a>
+                <?php else: ?>
+                    <a
+                        href="<?= e(url('ordem-de-servico/imprimir', ['id' => $transaction['id']])) ?>"
+                        class="btn btn-secondary"
+                        target="_blank"
+                        rel="noopener"
+                    >
+                        <i class="fa-solid fa-print"></i>
+                        Imprimir Ordem de Serviço
+                    </a>
+                <?php endif; ?>
+            <?php endif; ?>
+        </div>
     </div>
 </form>
 

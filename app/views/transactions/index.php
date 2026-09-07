@@ -80,6 +80,18 @@
                     </a>
                 </div>
             <?php endforeach; ?>
+
+            <?php if ($kind === 'saida'): ?>
+                <div class="recurring-month-launch" style="margin-top: 16px;">
+                    <form method="post" action="<?= e(url('recorrencias/lancar-mes')) ?>" onsubmit="return confirm('Lançar todas as recorrências ativas nas saídas de <?= e(month_label($month)) ?>?');">
+                        <input type="hidden" name="_csrf" value="<?= e(csrf_token()) ?>">
+                        <input type="hidden" name="month" value="<?= e($month) ?>">
+                        <button type="submit" class="btn btn-red" style="width: 100%;">
+                            <i class="fa-solid fa-rotate"></i> Lançar todas as recorrências de <?= e(month_label($month)) ?>
+                        </button>
+                    </form>
+                </div>
+            <?php endif; ?>
         </section>
     <?php endforeach; ?>
 </div>
