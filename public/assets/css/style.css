@@ -18,7 +18,7 @@ html,
 body {
   margin: 0;
   min-height: 100%;
-  font-family: "Geist", sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   color: var(--text);
   background: #fff;
 }
@@ -201,12 +201,6 @@ textarea {
   color: #111;
 }
 
-.recurring-launch {
-  margin-top: 16px;
-  display: flex;
-  justify-content: center;
-}
-
 .page-title {
   display: flex;
   align-items: center;
@@ -256,6 +250,114 @@ textarea {
   display: block;
   font-size: 13px;
   margin-top: 2px;
+}
+
+.transaction-meta {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.service-order-badge {
+  background: #17ad00;
+  color: #fff;
+  border-radius: 21px;
+  padding: 7px 15px;
+  text-align: center;
+  line-height: 1.05;
+  font-size: 9px;
+  min-width: 126px;
+}
+
+.service-order-badge span {
+  display: block;
+}
+
+.service-order-badge strong {
+  display: block;
+  font-size: 15px;
+  letter-spacing: .5px;
+  margin-top: 3px;
+}
+
+.service-orders-list {
+  width: 100%;
+}
+
+.service-order-date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 17px 0 6px;
+  padding: 8px 12px;
+  background: #f0f2f3;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #222;
+}
+
+.service-order-row {
+  display: grid;
+  grid-template-columns: 120px minmax(160px, 1.1fr) minmax(160px, 1.5fr) 100px 72px 30px 30px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 42px;
+  padding: 6px 10px;
+  margin: 4px 0;
+  background: #fff;
+  border: 1px solid #e1e3e5;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.service-order-row.overdue {
+  background: #fcf7ce;
+}
+
+.service-order-row.paid {
+  background: #e8f5e9;
+}
+
+.service-order-number {
+  font-weight: 800;
+  color: #0c2c10;
+}
+
+.service-order-client,
+.service-order-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.service-order-value {
+  text-align: right;
+  font-weight: 800;
+}
+
+@media (max-width: 900px) {
+  .service-order-row {
+    grid-template-columns: 105px minmax(120px, 1fr) minmax(140px, 1.3fr) 90px 68px 30px 30px;
+    gap: 7px;
+  }
+}
+
+@media (max-width: 700px) {
+  .transaction-meta {
+    flex-direction: column;
+  }
+
+  .service-order-row {
+    grid-template-columns: 85px minmax(120px, 1fr) 78px 28px 28px 28px 28px;
+  }
+
+  .service-order-item,
+  .service-order-row .mini-status {
+    display: none;
+  }
 }
 
 .panel {
@@ -445,7 +547,7 @@ textarea {
 
 .history-date {
   color: #8a8d92;
-  font-size: 13px;
+  font-size: 11px;
   white-space: nowrap;
 }
 
@@ -460,12 +562,10 @@ textarea {
 
 .paid {
   color: #52ad62;
-  font-weight: 700;
 }
 
 .pending {
-  color: #666;
-  font-weight: 700;
+  color: #aaa;
 }
 
 .circle-search,
@@ -484,6 +584,24 @@ textarea {
   background: #dfe3e7;
   color: #616a73;
   font-size: 12px;
+}
+
+.circle-print {
+  width: 25px;
+  height: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #dfe3e7;
+  color: #616a73;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.circle-print:hover,
+.circle-search:hover {
+  filter: brightness(.96);
 }
 
 .circle-delete {
@@ -655,7 +773,7 @@ textarea {
 
 .ledger-row {
   display: grid;
-  grid-template-columns: 70px minmax(0, 1fr) 92px 51px 25px;
+  grid-template-columns: 70px minmax(0, 1fr) 82px 51px 25px;
   gap: 6px;
   align-items: center;
   border: 1px solid #e0e2e4;
@@ -663,7 +781,7 @@ textarea {
   padding: 5px 7px;
   margin-top: 5px;
   color: #777;
-  font-size: 14px;
+  font-size: 10.5px;
 }
 
 .ledger-row strong {
@@ -674,7 +792,7 @@ textarea {
 }
 
 .mini-status {
-  font-size: 10.5px;
+  font-size: 9.5px;
 }
 
 .empty-state {
@@ -792,7 +910,36 @@ textarea {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-top: 19px;
+}
+
+.form-actions-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-print {
+  background: #e7e9ec;
+  color: #111;
+}
+
+.btn-print:hover {
+  background: #dfe2e6;
+}
+
+@media (max-width: 700px) {
+  .form-actions {
+    flex-wrap: wrap;
+  }
+
+  .form-actions-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 
 .delete-form {
@@ -857,14 +1004,14 @@ textarea {
   margin: 5px 0;
 }
 
-
-.client-name-pill, .rec-item {
-    border: 1px solid #dedfe1;
-    border-radius: 20px;
-    padding: 10px 15px;
-    color: #74767a;
-    font-size: 14px;
-    background: #fff;
+.client-name-pill,
+.rec-item {
+  border: 1px solid #dedfe1;
+  border-radius: 16px;
+  padding: 6px 15px;
+  color: #74767a;
+  font-size: 12px;
+  background: #fff;
 }
 
 .recurring-list {
@@ -881,7 +1028,7 @@ textarea {
 }
 
 .rec-day {
-  font-size: 14px;
+  font-size: 11px;
   color: #777;
   text-align: center;
 }
@@ -893,19 +1040,19 @@ textarea {
 }
 
 .login-logo {
-    position: relative;
-    margin-top: 30px;
-    left: 66px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 29px;
-    letter-spacing: -1.8px;
+  position: absolute;
+  top: 31px;
+  left: 66px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 29px;
+  letter-spacing: -1.8px;
 }
 
 .login-card {
   width: 405px;
-  margin: 100px auto 0;
+  margin: 170px auto 0;
 }
 
 .login-card h1 {

@@ -16,6 +16,10 @@ class TransactionController {
         $id=(int)($_GET['id']??0); $editing=$id>0; $errors=[];
         $default=['id'=>0,'client_id'=>'','item'=>'','amount'=>'','payment_method'=>'Pix','installments'=>'1X','brand'=>'Mastercard','status'=>'Pago','transaction_date'=>date('Y-m-d'),'period_month'=>date('Y-m-01'),'notes'=>'','original_date'=>date('Y-m-d'),'installment_number'=>null,'installment_total'=>null];
         $transaction=$editing ? ($tx->find($id,$kind) ?: $default) : $default;
+        if(!$editing && $kind==='entrada') {
+            $nextOrder = (int) db()->query("SELECT COALESCE(MAX(service_order_number),0)+1 FROM transactions WHERE kind='entrada'")->fetchColumn();
+            $transaction['service_order_number'] = max(1, $nextOrder);
+        }
         if($editing && ($transaction['payment_method']??'')==='Cartão de Crédito') {
             $transaction['amount']=number_format((float)$transaction['amount'],2,'.','');
         }
@@ -35,17 +39,12 @@ class TransactionController {
             ];
             if($editing) $data['original_date']=(string)($transaction['original_date']??$transaction['transaction_date']??$data['transaction_date']);
             if($data['item']==='') $errors[]='Informe o item.';
+            $dateOk = DateTime::createFromFormat('Y-m-d', $data['transaction_date']);
+            if(!$dateOk || $dateOk->format('Y-m-d') !== $data['transaction_date']) $errors[]='Informe uma data válida.';
             if($data['amount']<=0) $errors[]='Informe um valor maior que zero.';
             $validPayments = payment_options();
             if($legacyPayment) $validPayments[] = trim((string)($transaction['payment_method']??''));
             if(!in_array($data['payment_method'],$validPayments,true)) $errors[]='Método de pagamento inválido.';
-            if(!$editing && $data['payment_method']==='Débito') {
-                $today = new DateTimeImmutable('today');
-                $data['original_date'] = $today->format('Y-m-d');
-                $data['transaction_date'] = $today->modify('+1 day')->format('Y-m-d');
-            }
-            $dateOk = DateTime::createFromFormat('Y-m-d', $data['transaction_date']);
-            if(!$dateOk || $dateOk->format('Y-m-d') !== $data['transaction_date']) $errors[]='Informe uma data válida.';
             if($kind==='entrada' && $data['client_id']===null) $errors[]='Selecione um cliente.';
             if($data['payment_method']==='Cartão de Crédito'){
                 if(!in_array($data['installments'],parcel_options(),true)) $errors[]='Selecione o número de parcelas.';
@@ -66,17 +65,5 @@ class TransactionController {
 
     public function delete(): void {
         require_auth(); verify_csrf(); $id=(int)($_POST['id']??0); if($id>0)(new Transaction(db()))->delete($id); flash('success','Lançamento excluído.'); redirect_to('lancamentos');
-    }
-
-    public function launchRecurrings(): void {
-        require_auth();
-        verify_csrf();
-        $month = month_start((string) ($_POST['month'] ?? date('Y-m-01')));
-        $created = launch_recurring_expenses_for_month($month);
-        flash('success', $created > 0
-            ? "{$created} recorrência(s) lançada(s) em " . month_label($month) . '.'
-            : 'Todas as recorrências já foram lançadas neste mês.'
-        );
-        redirect_to('lancamentos', ['month' => $month]);
     }
 }

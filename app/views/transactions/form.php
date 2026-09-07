@@ -8,9 +8,17 @@
         <?= $editing ? 'Editar ' : '' ?><?= $isEntrada ? 'Entrada' : 'Saída' ?>
     </h1>
 
-    <div class="date-badge">
-        <span>Lançado em</span>
-        <strong><?= e(date_br($transaction['original_date'] ?: $transaction['transaction_date'])) ?></strong>
+    <div class="transaction-meta">
+        <?php if ($isEntrada): ?>
+            <div class="service-order-badge">
+                <span>Ordem de Serviço</span>
+                <strong><?= e(service_order_label($transaction['service_order_number'] ?? 0)) ?></strong>
+            </div>
+        <?php endif; ?>
+        <div class="date-badge">
+            <span>Lançado em</span>
+            <strong><?= e(date_br($transaction['original_date'] ?: $transaction['transaction_date'])) ?></strong>
+        </div>
     </div>
 </div>
 
@@ -137,10 +145,24 @@
             <i class="fa-solid fa-arrow-left"></i>
             Voltar
         </a>
-        <button class="btn btn-primary" type="submit">
-            <i class="fa-solid fa-floppy-disk"></i>
-            Salvar
-        </button>
+        <div class="form-actions-right">
+            <button class="btn btn-primary" type="submit">
+                <i class="fa-solid fa-floppy-disk"></i>
+                Salvar
+            </button>
+
+            <?php if ($isEntrada && $editing): ?>
+                <a
+                    class="btn btn-print"
+                    href="<?= e(url('ordem-de-servico/imprimir', ['id' => $transaction['id']])) ?>"
+                    target="_blank"
+                    rel="noopener"
+                >
+                    <i class="fa-solid fa-print"></i>
+                    Imprimir Ordem de Serviço
+                </a>
+            <?php endif; ?>
+        </div>
     </div>
 </form>
 

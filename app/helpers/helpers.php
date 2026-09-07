@@ -27,7 +27,7 @@ function parse_money(mixed $value): float {
 }
 
 function date_br(?string $date): string {
-    return $date ? date('d/m/y', strtotime($date)) : '';
+    return $date ? date('d/m/Y', strtotime($date)) : '';
 }
 
 function month_label(string $ymd): string {
@@ -48,6 +48,11 @@ function payment_options(): array { return ['Pix', 'Dinheiro', 'Cartão de Créd
 function parcel_options(): array { return ['1X', '2X', '3X', '4X', '5X', '6X', '7X', '8X', '9X', '10X', '11X', '12X']; }
 function brand_options(): array { return ['Mastercard', 'Visa', 'Elo']; }
 function status_options(): array { return ['Pago', 'Pendente']; }
+
+function service_order_label(mixed $number): string {
+    $n = (int) $number;
+    return $n > 0 ? str_pad((string) $n, 5, '0', STR_PAD_LEFT) : '—';
+}
 
 function page_title(string $title): string { return $title . ' - ' . APP_NAME; }
 
@@ -119,97 +124,24 @@ function split_installments(float $total, int $count): array {
     return $values;
 }
 
-function sync_due_credit_installments(): int {
+function sync_due_credit_installments(): void {
     $sql = "UPDATE transactions
             SET status = 'Pago'
             WHERE kind IN ('entrada','saida')
               AND payment_method = 'Cartão de Crédito'
               AND status = 'Pendente'
               AND transaction_date <= CURDATE()";
-    return db()->exec($sql);
+    db()->exec($sql);
 }
 
-function ensure_recurring_releases_table(PDO $db): void {
-    $db->exec(
-        "CREATE TABLE IF NOT EXISTS recurring_releases (
-            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            recurring_id INT UNSIGNED NOT NULL,
-            period_month DATE NOT NULL,
-            transaction_id BIGINT UNSIGNED NULL,
-            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE KEY uq_recurring_releases_period (recurring_id, period_month),
-            INDEX idx_recurring_releases_transaction (transaction_id),
-            CONSTRAINT fk_recurring_releases_recurring
-                FOREIGN KEY (recurring_id) REFERENCES recurrings(id) ON DELETE CASCADE,
-            CONSTRAINT fk_recurring_releases_transaction
-                FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE SET NULL
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
-    );
-}
+function sync_recurring_expenses(): int {
+    $today = new DateTime('today');
 
-function recurring_due_date(string $periodMonth, int $dayOfMonth): string {
-    $month = new DateTimeImmutable(month_start($periodMonth));
-    $day = min(max(1, $dayOfMonth), (int) $month->format('t'));
-    return $month->setDate((int) $month->format('Y'), (int) $month->format('m'), $day)->format('Y-m-d');
-}
-
-/**
- * Creates one pending outgoing transaction for every active recurrence in the
- * requested month. The release table makes the operation idempotent.
- */
-function launch_recurring_expenses_for_month(string $month): int {
-    $targetMonth = month_start($month);
-    $db = db();
-    ensure_recurring_releases_table($db);
-
-    $recurrings = $db->query('SELECT id, item, amount, day_of_month FROM recurrings WHERE active=1 ORDER BY id')->fetchAll();
-    if (!$recurrings) return 0;
-
-    $claimRelease = $db->prepare('INSERT IGNORE INTO recurring_releases(recurring_id, period_month) VALUES(?, ?)');
-    $createTransaction = $db->prepare(
-        "INSERT INTO transactions(
-            kind, client_id, item, amount, payment_method, installments, brand,
-            status, transaction_date, period_month, original_date
-        ) VALUES('saida', NULL, ?, ?, NULL, '1X', NULL, 'Pendente', ?, ?, ?)"
-    );
-    $linkRelease = $db->prepare('UPDATE recurring_releases SET transaction_id=? WHERE recurring_id=? AND period_month=?');
-    $created = 0;
-
-    $db->beginTransaction();
-    try {
-        foreach ($recurrings as $recurring) {
-            $recurringId = (int) $recurring['id'];
-            $claimRelease->execute([$recurringId, $targetMonth]);
-            if ($claimRelease->rowCount() !== 1) continue;
-
-            $dueDate = recurring_due_date($targetMonth, (int) $recurring['day_of_month']);
-            $createTransaction->execute([
-                $recurring['item'],
-                $recurring['amount'],
-                $dueDate,
-                $targetMonth,
-                $dueDate,
-            ]);
-            $linkRelease->execute([(int) $db->lastInsertId(), $recurringId, $targetMonth]);
-            $created++;
-        }
-        $db->commit();
-    } catch (Throwable $e) {
-        if ($db->inTransaction()) $db->rollBack();
-        throw $e;
+    // As recorrências são lançadas somente no dia 01 de cada mês.
+    if ($today->format('d') !== '01') {
+        return 0;
     }
 
-    return $created;
-}
-
-/**
- * On the first day of each month, creates the active recurring expenses for
- * the following month.
- */
-function launch_recurring_expenses_for_next_month(?DateTimeInterface $now = null): int {
-    $now ??= new DateTimeImmutable('now');
-    if ($now->format('d') !== '01') return 0;
-
-    $targetMonth = (new DateTimeImmutable($now->format('Y-m-01')))->modify('+1 month')->format('Y-m-01');
-    return launch_recurring_expenses_for_month($targetMonth);
+    $recurring = new Recurring(db());
+    return $recurring->generateForNextMonth($today->format('Y-m-d'));
 }

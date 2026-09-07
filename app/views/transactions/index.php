@@ -71,8 +71,8 @@
 
             <?php foreach ($rows as $r): ?>
                 <div class="ledger-row">
-                    <span style="color:#aaa;"><?= e(date_br($r['transaction_date'])) ?> </span>
-                    <strong style="margin-left: 15px;"><?= ucwords(strtolower(e($r['client_name'] ?: $r['item']))) ?></strong>
+                    <span><?= e(date_br($r['transaction_date'])) ?></span>
+                    <strong><?= e($r['client_name'] ?: $r['item']) ?></strong>
                     <span><?= e(money($r['amount'])) ?></span>
                     <span class="mini-status <?= $r['status'] === 'Pago' ? 'paid' : 'pending' ?>"><?= e($r['status']) ?></span>
                     <a class="circle-search" href="<?= e(url($kind, ['id' => $r['id']])) ?>" aria-label="Ver lançamento">
@@ -80,17 +80,6 @@
                     </a>
                 </div>
             <?php endforeach; ?>
-
-            <?php if ($kind === 'saida'): ?>
-                <form class="recurring-launch" method="post" action="<?= e(url('lancamentos/recorrencias')) ?>">
-                    <input type="hidden" name="_csrf" value="<?= e(csrf_token()) ?>">
-                    <input type="hidden" name="month" value="<?= e($month) ?>">
-                    <button class="btn btn-red" type="submit">
-                        <i class="fa-solid fa-repeat"></i>
-                        Lançar recorrências em <?= e(month_label($month)) ?>
-                    </button>
-                </form>
-            <?php endif; ?>
         </section>
     <?php endforeach; ?>
 </div>

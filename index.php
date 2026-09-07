@@ -9,6 +9,7 @@ require_once __DIR__.'/app/controllers/DashboardController.php';
 require_once __DIR__.'/app/controllers/TransactionController.php';
 require_once __DIR__.'/app/controllers/ClientController.php';
 require_once __DIR__.'/app/controllers/RecurringController.php';
+require_once __DIR__.'/app/controllers/ServiceOrderController.php';
 
 $path=parse_url($_SERVER['REQUEST_URI']??'/',PHP_URL_PATH) ?: '/';
 $base=rtrim(str_replace('\\','/',dirname($_SERVER['SCRIPT_NAME']??'/index.php')),'/');
@@ -30,7 +31,8 @@ switch($route){
     case '/recorrencias': (new RecurringController())->index(); break;
     case '/recorrencia': (new RecurringController())->form(); break;
     case '/recorrencia/excluir': if($_SERVER['REQUEST_METHOD']==='POST')(new RecurringController())->delete(); else redirect_to('recorrencias'); break;
+    case '/ordens-de-servico': (new ServiceOrderController())->index(); break;
+    case '/ordem-de-servico/imprimir': (new ServiceOrderController())->print((int)($_GET['id'] ?? 0)); break;
     case '/lancamento/excluir': if($_SERVER['REQUEST_METHOD']==='POST')(new TransactionController())->delete(); else redirect_to('lancamentos'); break;
-    case '/lancamentos/recorrencias': if($_SERVER['REQUEST_METHOD']==='POST')(new TransactionController())->launchRecurrings(); else redirect_to('lancamentos'); break;
     default: http_response_code(404); echo 'Página não encontrada.'; break;
 }

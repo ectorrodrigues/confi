@@ -1,16 +1,15 @@
 # confi
 
-## Rotinas automáticas
 
-No dia 01, todas as recorrências ativas são lançadas como saídas pendentes do
-mês seguinte, usando o dia configurado em cada recorrência como vencimento. A
-rotina é idempotente: uma recorrência só gera um lançamento por mês.
 
-Para que isso ocorra mesmo sem alguém abrir o sistema, execute o cron abaixo
-diariamente no servidor (ajuste os caminhos):
+### Lançamento automático de recorrências
 
-```cron
-0 0 * * * /caminho/para/php /caminho/para/confi/cron/sync-credit-status.php
+No dia 01 de cada mês, as recorrências ativas são lançadas automaticamente como saídas `Pendente` no próximo mês, usando o dia configurado na recorrência. O processo é idempotente e não duplica o mesmo lançamento para a mesma recorrência e mês.
+
+O sistema também executa essa sincronização automaticamente quando é acessado no dia 01. Para garantir a execução mesmo sem abrir o sistema nesse dia, configure o cron do MAMP/macOS para executar diariamente:
+
+```bash
+0 1 * * * /Applications/MAMP/bin/php/php8.*/bin/php /Applications/MAMP/htdocs/confi/cron/generate-recurring-expenses.php
 ```
 
-O mesmo cron também atualiza o status das parcelas de cartão vencidas.
+Ajuste o caminho da versão do PHP e da pasta `htdocs` conforme sua instalação.

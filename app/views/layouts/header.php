@@ -8,17 +8,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= e(page_title($title)) ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="<?= e(asset_url('css/style.css')) ?>">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.7.2/css/all.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://unpkg.com/@popperjs/core@2"></script>
-    <script src="https://unpkg.com/tippy.js@6"></script>
-    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/shift-away.css">
     <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body class="app-body">
 <div class="app-shell">
@@ -31,6 +24,7 @@
             <a class="<?= $page === 'lancamentos' ? 'active' : '' ?>" href="<?= e(url('lancamentos')) ?>"><i class="fa-solid fa-list-check"></i><span>Lançamentos</span></a>
             <a class="<?= $page === 'clientes' ? 'active' : '' ?>" href="<?= e(url('clientes')) ?>"><i class="fa-solid fa-users"></i><span>Clientes</span></a>
             <a class="<?= $page === 'recorrencias' ? 'active' : '' ?>" href="<?= e(url('recorrencias')) ?>"><i class="fa-solid fa-repeat"></i><span>Recorrências</span></a>
+            <a class="<?= $page === 'ordens-servico' ? 'active' : '' ?>" href="<?= e(url('ordens-de-servico')) ?>"><i class="fa-solid fa-clipboard-list"></i><span>Ordens de Serviço</span></a>
         </nav>
         <a class="side-logout" href="<?= e(url('logout')) ?>"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>Sair</span></a>
     </aside>
