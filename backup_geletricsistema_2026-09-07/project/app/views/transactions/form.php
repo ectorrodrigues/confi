@@ -149,17 +149,6 @@
             <i class="fa-solid fa-floppy-disk"></i>
             Salvar
         </button>
-        <?php if ($isEntrada && $editing && !empty($transaction['service_order_number'])): ?>
-            <a
-                href="<?= e(url('ordem-de-servico/imprimir', ['id' => $transaction['id']])) ?>"
-                class="btn btn-secondary"
-                target="_blank"
-                rel="noopener"
-            >
-                <i class="fa-solid fa-print"></i>
-                Imprimir Ordem de Serviço
-            </a>
-        <?php endif; ?>
     </div>
 </form>
 
