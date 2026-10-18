@@ -174,6 +174,12 @@ class Transaction {
 
     public function createOrReplace(array $data, string $kind, int $id=0): int {
         if($id>0) {
+            $existing=$this->find($id,$kind);
+            if(!$existing) throw new RuntimeException('Lançamento não encontrado.');
+            if($data['payment_method']==='Cartão de Crédito' && empty($existing['installment_group'])) {
+                $data['notes']=$data['notes'] ?? $existing['notes'];
+                return $this->createCreditInstallments($data,$kind,$id);
+            }
             $st=$this->db->prepare('UPDATE transactions SET client_id=?, item=?, amount=?, payment_method=?, installments=?, brand=?, status=?, transaction_date=?, period_month=?, original_date=? WHERE id=? AND kind=?');
             $st->execute([$data['client_id'],$data['item'],$data['amount'],$data['payment_method'],$data['installments'],$data['brand'],$data['status'],$data['transaction_date'],month_start($data['transaction_date']),$data['original_date'],$id,$kind]);
             return $id;
@@ -183,23 +189,39 @@ class Transaction {
         $originalDate=$data['original_date'] ?? $date;
         $total=(float)$data['amount'];
         $notes=$data['notes'] ?? null;
-        $installments=$method==='Cartão de Crédito' ? installment_count($data['installments']) : 1;
         if($method==='Cartão de Crédito'){
-            $status='Pendente';
-            $values=split_installments($total,$installments);
-            $group=bin2hex(random_bytes(16));
-            $st=$this->db->prepare('INSERT INTO transactions(kind,client_id,item,amount,payment_method,installments,brand,status,transaction_date,period_month,notes,installment_group,installment_number,installment_total,original_date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
-            $firstId=0;
-            foreach($values as $idx=>$value){
-                $due=add_month_same_day($date,$idx+1);
-                $st->execute([$kind,$data['client_id'],$data['item'],$value,$method,$data['installments'],$data['brand'],$status,$due,month_start($due),$notes,$group,$idx+1,$installments,$date]);
-                if($firstId===0)$firstId=(int)$this->db->lastInsertId();
-            }
-            return $firstId;
+            return $this->createCreditInstallments($data,$kind);
         }
         $st=$this->db->prepare('INSERT INTO transactions(kind,client_id,item,amount,payment_method,installments,brand,status,transaction_date,period_month,notes,original_date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)');
         $st->execute([$kind,$data['client_id'],$data['item'],$total,$method,$data['installments'],'',$data['status'],$date,month_start($date),$notes,$originalDate]);
         return (int)$this->db->lastInsertId();
+    }
+
+    private function createCreditInstallments(array $data, string $kind, int $id=0): int {
+        $count=installment_count($data['installments']);
+        $values=split_installments((float)$data['amount'],$count);
+        $group=bin2hex(random_bytes(16));
+        $this->db->beginTransaction();
+        try {
+            $insert=$this->db->prepare('INSERT INTO transactions(kind,client_id,item,amount,payment_method,installments,brand,status,transaction_date,period_month,notes,installment_group,installment_number,installment_total,original_date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)');
+            $firstId=$id;
+            foreach($values as $idx=>$value) {
+                $due=add_month_same_day($data['transaction_date'],$idx+1);
+                $fields=[$kind,$data['client_id'],$data['item'],$value,'Cartão de Crédito',$data['installments'],$data['brand'],'Pendente',$due,month_start($due),$data['notes'] ?? null,$group,$idx+1,$count,$data['transaction_date']];
+                if($idx===0 && $id>0) {
+                    $update=$this->db->prepare('UPDATE transactions SET kind=?,client_id=?,item=?,amount=?,payment_method=?,installments=?,brand=?,status=?,transaction_date=?,period_month=?,notes=?,installment_group=?,installment_number=?,installment_total=?,original_date=? WHERE id=? AND kind=?');
+                    $update->execute([...$fields,$id,$kind]);
+                } else {
+                    $insert->execute($fields);
+                    if($firstId===0) $firstId=(int)$this->db->lastInsertId();
+                }
+            }
+            $this->db->commit();
+            return $firstId;
+        } catch(Throwable $error) {
+            $this->db->rollBack();
+            throw $error;
+        }
     }
 
     public function delete(int $id): void {
