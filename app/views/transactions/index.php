@@ -22,7 +22,7 @@
         <div class="month-scroll">
             <?php foreach ($months as $m): ?>
                 <a class="month-pill <?= $m === $month ? 'selected' : '' ?>" href="<?= e(url('lancamentos', ['month' => $m])) ?>">
-                    <?= e(month_label($m)) ?>
+                    <?= e(month_label($m, true)) ?>
                 </a>
             <?php endforeach; ?>
         </div>
