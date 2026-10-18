@@ -30,10 +30,10 @@ function date_br(?string $date): string {
     return $date ? date('d/m/y', strtotime($date)) : '';
 }
 
-function month_label(string $ymd): string {
+function month_label(string $ymd, bool $shortYear = false): string {
     $months = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
     $t = strtotime($ymd);
-    return ucfirst($months[(int)date('n', $t) - 1]) . '/' . date('Y', $t);
+    return ucfirst($months[(int)date('n', $t) - 1]) . '/' . date($shortYear ? 'y' : 'Y', $t);
 }
 
 function month_start(?string $value): string {
