@@ -1,7 +1,7 @@
 <?php require __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="page-title">
-    <h1>Lançamentos</h1>
+    <h1>Lançamentos Teste</h1>
 </div>
 
 <section class="calendar-strip panel-light">
